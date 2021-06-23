@@ -1,0 +1,1 @@
+https://www.rithmschool.com/courses/intermediate-node-express/api-tests-with-jest

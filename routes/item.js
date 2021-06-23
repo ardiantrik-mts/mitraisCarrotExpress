@@ -6,6 +6,7 @@ router.get('/', async (req, res) => {
     console.log("im here");
     try {
         const items = await Item.find();
+        // res.sendStatus(200);
         res.json(items);
     } catch (err) {
         res.status(500).json({ message: err.message });
@@ -34,7 +35,8 @@ router.post('/', async (req, res) => {
 
     try{
         const newItem = await item.save();
-        res.status(201).json(newItem);
+        res.sendStatus(200);
+        // res.status(200).json(newItem);
     }catch(error){
         res.status(400);
         console.log(error.message);
