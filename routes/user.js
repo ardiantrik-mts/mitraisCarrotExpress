@@ -1,9 +1,11 @@
 const express = require('express');
 const bcrypt = require('bcrypt');
 const router = express.Router();
+const jwt = require('jsonwebtoken');
 const User = require('../models/user');
+const authVerify = require('./authVerify');
 
-router.get('/', async (req, res) => {
+router.get('/', authVerify, async (req, res) => {
     console.log("im here");
     try {
         const users = await User.find();
@@ -23,7 +25,7 @@ router.get('/:name', async (req, res) => {
     }
 });
 
-router.post('/', async (req, res) => {
+router.post('/register', async (req, res) => {
 
     const hashedPass = await bcrypt.hash(req.body.password, 10);
 
@@ -44,6 +46,31 @@ router.post('/', async (req, res) => {
         res.status(400);
         console.log(error.message);
     }
+});
+
+router.post('/login', async (req, res) => {
+
+    const user = await User.findOne({ username: req.body.username });
+    if (!user) {
+        return res.status(400).send('Username not found');
+    }
+
+    const validPass = await bcrypt.compare(req.body.password, user.password)
+    if (!validPass) {
+        return res.status(400).send('Invalid Password');
+    }
+
+    const token = jwt.sign({ _id: user._id }, process.env.TOKEN_SECRET);
+    res.header('auth-token', token).send(token);
+    // res.send('Logged In')
+
+    // try{
+    //     const newUser = await user.save();
+    //     res.status(201).json(newUser);
+    // }catch(error){
+    //     res.status(400);
+    //     console.log(error.message);
+    // }
 });
 
 router.patch('/:id', async (req, res) => {
